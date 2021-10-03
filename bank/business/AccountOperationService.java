@@ -19,7 +19,7 @@ import bank.business.domain.Withdrawal;
 public interface AccountOperationService {
 
 	public Deposit deposit(long operationLocation, long branch,
-			long accountNumber, long envelope, double amount)
+			long accountNumber, long envelope, double amount, double pendentAmount, int status)
 			throws BusinessException;
 
 	public double getBalance(long branch, long accountNumber)
@@ -30,7 +30,10 @@ public interface AccountOperationService {
 
 	public List<Transaction> getStatementByMonth(long branch,
 			long accountNumber, int month, int year) throws BusinessException;
-
+	
+	public List<Deposit> getPendentDeposits(long branch,
+			long accountNumber) throws BusinessException;
+	
 	public CurrentAccount login(long branch, long accountNumber, String password)
 			throws BusinessException;
 
