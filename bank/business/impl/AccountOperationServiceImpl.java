@@ -5,6 +5,7 @@ package bank.business.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -18,6 +19,7 @@ import bank.business.domain.CurrentAccount;
 import bank.business.domain.CurrentAccountId;
 import bank.business.domain.Deposit;
 import bank.business.domain.OperationLocation;
+import bank.business.domain.STATUS;
 import bank.business.domain.Transaction;
 import bank.business.domain.Transfer;
 import bank.business.domain.Withdrawal;
@@ -37,12 +39,12 @@ public class AccountOperationServiceImpl implements AccountOperationService {
 
 	@Override
 	public Deposit deposit(long operationLocation, long branch,
-			long accountNumber, long envelope, double amount, double pendentAmount, int status)
+			long accountNumber, long envelope, double amount,STATUS status)
 			throws BusinessException {
 		CurrentAccount currentAccount = readCurrentAccount(branch,
 				accountNumber);
 		Deposit deposit = currentAccount.deposit(
-				getOperationLocation(operationLocation), envelope, amount, pendentAmount, status);
+				getOperationLocation(operationLocation), envelope, amount, status);
 		return deposit;
 	}
 
@@ -91,18 +93,41 @@ public class AccountOperationServiceImpl implements AccountOperationService {
 				begin, end);
 	}
 	
-	public List<Deposit> getPendentDeposits(long branch,
-			long accountNumber) throws BusinessException {
-		List<Deposit> var = readCurrentAccount(branch, accountNumber).getDeposits();
+	public List<Deposit> getPending() throws BusinessException {
+		Collection<CurrentAccount> contas = database.getAllCurrentAccounts();
 		List<Deposit> pendents = new ArrayList<Deposit>();
-		for(Deposit D : var)
-		{
-			if(D.getStatus() == 2) 
-			{
-				pendents.add(D);
+		
+		contas.forEach(c -> {
+			List<Deposit> var = c.getDeposits();
+			for(Deposit D : var){
+				if(D.getStatus() == STATUS.PENDENTE) 
+				{
+					pendents.add(D);
+				}
+			}
+		});
+		return pendents;		
+	}
+	
+	@Override
+	public void pedingOperation(Deposit pedingDeposit, Boolean confirmDeposit) {
+		
+		if(confirmDeposit) {
+		if (pedingDeposit.getAmount() > 100 && pedingDeposit.getStatus() == STATUS.PENDENTE ) {
+			pedingDeposit.getAccount().setBalance(pedingDeposit.getAmount());
+			pedingDeposit.setStatus(STATUS.FINALIZADO);
+		} else {
+			pedingDeposit.setStatus(STATUS.FINALIZADO);
+		}
+	}
+		else {
+			if (pedingDeposit.getAmount() < 100 && pedingDeposit.getStatus() == STATUS.PENDENTE) {
+				pedingDeposit.getAccount().setBalance(-pedingDeposit.getAmount());
+				pedingDeposit.setStatus(STATUS.CANCELADO);
+			} else {
+				pedingDeposit.setStatus(STATUS.CANCELADO);
 			}
 		}
-		return pendents;		
 	}
 
 	@Override

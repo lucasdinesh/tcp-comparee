@@ -31,7 +31,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
-
 import bank.business.AccountOperationService;
 import bank.business.BusinessException;
 import bank.business.domain.Branch;
@@ -161,10 +160,8 @@ public class StatementAction extends AccountAbstractAction {
 			case 4:
 				if (t instanceof Deposit) {
 					if(t.getAmount() != 0) {
-						val = "+ " + t.getAmount();						
-					}else {
-						val = "+ " + t.getPendentAmount();	
-					}
+						val = "+ " + t.getAmount();
+						}
 				} else if (t instanceof Transfer) {
 					Transfer transfer = (Transfer) t;
 					if (transfer.getAccount().getId().equals(id)) {

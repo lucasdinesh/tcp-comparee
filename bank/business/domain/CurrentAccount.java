@@ -1,8 +1,6 @@
 package bank.business.domain;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import bank.business.BusinessException;
 
 /**
@@ -10,10 +8,10 @@ import bank.business.BusinessException;
  * 
  */
 public class CurrentAccount implements Credentials {
-
+	private static final int cutPoint = 100;
 	private double balance;
 	
-
+	
 	private Client client;
 	private List<Deposit> deposits;
 	private CurrentAccountId id;
@@ -35,21 +33,21 @@ public class CurrentAccount implements Credentials {
 		this.balance = initialBalance;
 	}
 
-	public Deposit deposit(OperationLocation location, long envelope, double amount, double pendentAmount, int status) throws BusinessException {
-		depositAmount(amount, pendentAmount);
+	public Deposit deposit(OperationLocation location, long envelope, double amount, STATUS status) throws BusinessException {
+		depositAmount(amount, status);
 
-		Deposit deposit = new Deposit(location, this, envelope, amount, pendentAmount, status);
+		Deposit deposit = new Deposit(location, this, envelope, amount, status);
 
 		this.deposits.add(deposit);
 
 		return deposit;
 	}
 
-	private void depositAmount(double amount, double pendentAmount) throws BusinessException {
-		if (!isValidAmount(amount, pendentAmount)) {
+	private void depositAmount(double amount, STATUS status) throws BusinessException {
+		if (!isValidAmount(amount)) {
 			throw new BusinessException("exception.invalid.amount");
 		}
-		if (amount < 100) {
+		if (amount < cutPoint || status == STATUS.FINALIZADO) {
 			this.balance += amount;
 		}
 	}
@@ -108,8 +106,8 @@ public class CurrentAccount implements Credentials {
 		return amount <= balance;
 	}
 
-	private boolean isValidAmount(double amount, double pendentAmount) {
-		if(amount > 0 || pendentAmount > 0) {
+	private boolean isValidAmount(double amount) {
+		if(amount > 0) {
 			return true;
 		} else {
 			return false;
@@ -119,7 +117,7 @@ public class CurrentAccount implements Credentials {
 	public Transfer transfer(OperationLocation location, CurrentAccount destinationAccount, double amount)
 			throws BusinessException {
 		withdrawalAmount(amount);
-		destinationAccount.depositAmount(amount, 0);
+		destinationAccount.depositAmount(amount, STATUS.FINALIZADO);
 
 		Transfer transfer = new Transfer(location, this, destinationAccount, amount);
 		this.transfers.add(transfer);
@@ -138,7 +136,7 @@ public class CurrentAccount implements Credentials {
 	}
 
 	private void withdrawalAmount(double amount) throws BusinessException {
-		if (!isValidAmount(amount, 0)) {
+		if (!isValidAmount(amount)) {
 			throw new BusinessException("exception.invalid.amount");
 		}
 

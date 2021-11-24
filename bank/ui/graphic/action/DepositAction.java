@@ -23,10 +23,13 @@ import javax.swing.KeyStroke;
 
 import bank.business.AccountOperationService;
 import bank.business.BusinessException;
+import bank.business.domain.Branch;
 import bank.business.domain.Deposit;
+import bank.business.domain.STATUS;
 import bank.ui.TextManager;
 import bank.ui.graphic.BankGraphicInterface;
 import bank.ui.graphic.GUIUtils;
+import bank.ui.text.UIUtils;
 
 /**
  * @author ingrid
@@ -90,61 +93,33 @@ public class DepositAction extends AccountAbstractAction {
 				return;
 			if (!GUIUtils.INSTANCE.checkMandatory(bankInterface.getFrame(), amount.getValue(), "amount"))
 				return;
-			if (bankInterface.getOperationLocation().getNumber() < 3) { // caso agencia
+			if (bankInterface.getOperationLocation() instanceof Branch) { 
 
 				Deposit deposit = accountOperationService.deposit(bankInterface.getOperationLocation().getNumber(),
 						((Number) branch.getValue()).longValue(), ((Number) accountNumber.getValue()).longValue(),
-						((Number) envelope.getValue()).intValue(), ((Number) amount.getValue()).doubleValue(), 0, 1);
+						((Number) envelope.getValue()).intValue(), ((Number) amount.getValue()).doubleValue(), STATUS.FINALIZADO);
 
 				StringBuffer sb = new StringBuffer();
-				sb.append(textManager.getText("message.operation.succesfull")).append("\n");
-
-				sb.append(textManager.getText("deposit") + ": " + deposit.getAmount()).append("\n");
-
-				sb.append("Status : FINALIZADO!");
-
+				sb.append(UIUtils.INSTANCE.getTextManager().getText("message.operation.succesfull")).append("\n");
+				sb.append(UIUtils.INSTANCE.getTextManager().getText("deposit") + ": " + deposit.getAmount()).append("\n");
+				sb.append(UIUtils.INSTANCE.getTextManager().getText("operation.deposit.succesfull"));
 				GUIUtils.INSTANCE.showMessage(bankInterface.getFrame(), sb.toString(), JOptionPane.INFORMATION_MESSAGE);
 				dialog.dispose();
 
-			} else { // caso banco
-
-				if (((Number) amount.getValue()).doubleValue() <= 100) {
+			} else { 
 
 					Deposit deposit = accountOperationService.deposit(bankInterface.getOperationLocation().getNumber(),
 							((Number) branch.getValue()).longValue(), ((Number) accountNumber.getValue()).longValue(),
-							((Number) envelope.getValue()).intValue(), ((Number) amount.getValue()).doubleValue(), 0, 2);
+							((Number) envelope.getValue()).intValue(), ((Number) amount.getValue()).doubleValue(), STATUS.PENDENTE);
 
 					StringBuffer sb = new StringBuffer();
-					sb.append(textManager.getText("message.operation.succesfull")).append("\n");
-
+					sb.append(UIUtils.INSTANCE.getTextManager().getText("message.operation.succesfull")).append("\n");
 					sb.append(textManager.getText("deposit") + ": " + deposit.getAmount()).append("\n");
-
-					sb.append("Status : PENDENTE!");
-
+					sb.append(UIUtils.INSTANCE.getTextManager().getText("operation.deposit.pendent"));
 					GUIUtils.INSTANCE.showMessage(bankInterface.getFrame(), sb.toString(),
 							JOptionPane.INFORMATION_MESSAGE);
 					dialog.dispose();
 
-				} else {
-
-					Deposit deposit = accountOperationService.deposit(bankInterface.getOperationLocation().getNumber(),
-							((Number) branch.getValue()).longValue(), ((Number) accountNumber.getValue()).longValue(),
-							((Number) envelope.getValue()).intValue(), 0, ((Number) amount.getValue()).doubleValue(), 2);
-
-					deposit.setPendentAmount(((Number) amount.getValue()).doubleValue());
-
-					StringBuffer sb = new StringBuffer();
-					sb.append(textManager.getText("message.operation.succesfull")).append("\n");
-
-					sb.append("Valor pendente: " + deposit.getPendentAmount()).append("\n");
-					sb.append("Valor depositado: " + deposit.getAmount()).append("\n");
-
-					sb.append("Status : PENDENTE!").append("\n");
-
-					GUIUtils.INSTANCE.showMessage(bankInterface.getFrame(), sb.toString(),
-							JOptionPane.INFORMATION_MESSAGE);
-					dialog.dispose();
-				}
 			}
 
 		} catch (BusinessException be) {

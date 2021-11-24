@@ -7,9 +7,8 @@ import java.util.Date;
  * 
  */
 public abstract class Transaction {
-
 	private CurrentAccount account;
-	private double amount, pendentAmount = 0;
+	private double amount;
 	private Date date;
 	private OperationLocation location;
 
@@ -65,12 +64,6 @@ public abstract class Transaction {
 		this.date = date;
 	}
 
-	public double getPendentAmount() {
-		return pendentAmount;
-	}
 
-	public void setPendentAmount(double pendentAmount) {
-		this.pendentAmount = pendentAmount;
-	}
 
 }

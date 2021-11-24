@@ -7,10 +7,9 @@ package bank.business.domain;
 public class Deposit extends Transaction {
 
 	private long envelope;
-	private int status;
+	private STATUS status;
 	
-	public Deposit(OperationLocation location, CurrentAccount account, long envelope, double amount,
-			double pendentAmount, int status) {
+	public Deposit(OperationLocation location, CurrentAccount account, long envelope, double amount, STATUS status) {
 		super(location, account, amount);
 		this.envelope = envelope;
 		this.status = status;
@@ -24,11 +23,11 @@ public class Deposit extends Transaction {
 		return envelope;
 	}
 	
-	public int getStatus() {
+	public STATUS getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(STATUS status) {
 		this.status = status;
 	}
 }

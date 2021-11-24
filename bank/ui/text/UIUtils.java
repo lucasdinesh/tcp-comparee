@@ -12,6 +12,7 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import bank.business.domain.STATUS;
 import bank.ui.TextManager;
 
 /**
@@ -61,14 +62,17 @@ public class UIUtils {
 		return propertyToString(field, sdf.format(value));
 	}
 
+	@SuppressWarnings("removal")
 	public String propertyToString(String field, double value) {
 		return propertyToString(field, new Double(value).toString());
 	}
 
+	@SuppressWarnings("removal")
 	public String propertyToString(String field, int value) {
 		return propertyToString(field, new Integer(value).toString());
 	}
 
+	@SuppressWarnings("removal")
 	public String propertyToString(String field, long value) {
 		return propertyToString(field, new Long(value).toString());
 	}
@@ -105,6 +109,7 @@ public class UIUtils {
 		return value;
 	}
 
+	@SuppressWarnings("removal")
 	public Double readDouble(String field) {
 		Double value = null;
 		while (value == null) {
@@ -122,6 +127,7 @@ public class UIUtils {
 		return value;
 	}
 
+	@SuppressWarnings("removal")
 	public Integer readInteger(String field) {
 		Integer value = null;
 		while (value == null) {
@@ -154,6 +160,7 @@ public class UIUtils {
 		return value;
 	}
 
+	@SuppressWarnings("removal")
 	public Long readLong(String field) {
 		Long value = null;
 		while (value == null) {
@@ -178,6 +185,20 @@ public class UIUtils {
 				if (field != null)
 					System.out.print(textManager.getText(field) + ": ");
 				value = reader.readLine();
+			} catch (Exception e) {
+				handleUnexceptedError(e);
+			}
+		}
+		return value;
+	}
+
+	public STATUS readStatus(String field) {
+		STATUS value = null;
+		while (value == null) {
+			try {
+				if (field != null)
+					System.out.print(textManager.getText(field) + ": ");
+				
 			} catch (Exception e) {
 				handleUnexceptedError(e);
 			}
